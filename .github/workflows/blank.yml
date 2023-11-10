@@ -2,7 +2,7 @@ name: Unit test back
 
 on:
   push:
-     branches: [ $default-branch ]
+     branches: [ develop ]
   pull_request:
     branches: [ main, develop ]
 
