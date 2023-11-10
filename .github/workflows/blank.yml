@@ -2,9 +2,9 @@ name: Unit test back
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   build-and-test:
@@ -22,8 +22,8 @@ jobs:
             git merge --no-ff pr-${{ github.event.pull_request.number }}
             git branch -d pr-${{ github.event.pull_request.number }}
           else
-            git checkout $default-branch  # Substitua $default-branch pelo nome da sua branch principal
-            git pull origin $default-branch
+            git checkout develop  # Substitua $default-branch pelo nome da sua branch principal
+            git pull origin develop
           fi
           mvn test
 
