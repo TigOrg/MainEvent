@@ -1,20 +1,31 @@
-
-name: Unit test back
+name: Delete Merged Branch
 
 on:
   push:
-     branches: [ $default-branch ]
+    branches:
+      - main  # Substitua pelo nome da sua branch principal
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - main  # Substitua pelo nome da sua branch principal
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
+  delete-branch:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 17
-      uses: actions/setup-java@v1
-      with:
-        java-version: '17'
-    - name: run tests with Maven
-      run: mvn test
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Merge and Delete Branch
+        run: |
+          # Merge the pull request (if the event is pull_request)
+          if [ -n "${{ github.event.pull_request }}" ]; then
+            git fetch origin pull/${{ github.event.pull_request.number }}/head:pr-${{ github.event.pull_request.number }}
+            git merge pr-${{ github.event.pull_request.number }}
+            git branch -d pr-${{ github.event.pull_request.number }}
+          else
+            # Delete the branch after push event
+            git branch -d ${{ github.ref }}
+            git push origin --delete ${{ github.ref }}
+          fi
