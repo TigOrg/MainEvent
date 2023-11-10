@@ -1,8 +1,9 @@
+
 name: Unit test back
 
 on:
   push:
-    branches: [ $default-branch ]
+     branches: [ $default-branch ]
   pull_request:
     branches: [ main, develop ]
 
@@ -10,14 +11,10 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: Set up JDK 17
-        uses: actions/setup-java@v1
-        with:
-          java-version: '17'
-      - name: Merge and run tests with Maven
-        run: |
-          git checkout $default-branch  # Substitua $default-branch pelo nome da sua branch principal
-          git pull origin $default-branch
-          git merge --allow-unrelated-histories ${{ github.event.pull_request.head.ref }}
-          mvn test
+    - uses: actions/checkout@v1
+    - name: Set up JDK 17
+      uses: actions/setup-java@v1
+      with:
+        java-version: '17'
+    - name: run tests with Maven
+      run: mvn test
