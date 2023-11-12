@@ -23,6 +23,12 @@ jobs:
       with:
         java-version: '17'
 
+    - name: Merge main into develop
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        git checkout develop
+        git pull origin main
+
     - name: Rebase hotfix on main
       if: github.event_name == 'push' && github.ref == 'refs/heads/hotfix'
       run: |
@@ -31,6 +37,3 @@ jobs:
 
     - name: Run tests with Maven
       run: mvn test
-
-   
-
