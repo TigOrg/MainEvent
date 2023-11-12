@@ -23,17 +23,17 @@ jobs:
       with:
         java-version: '17'
 
-    - name: Merge main into develop
+    - name: Rebase develop on main
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        git checkout develop
-        git pull origin main
-
-    - name: Rebase hotfix on main
-      if: github.event_name == 'push' && github.ref == 'refs/heads/hotfix'
       run: |
         git fetch origin main
         git rebase origin/main
 
     - name: Run tests with Maven
       run: mvn test
+
+    - name: Deploy to Production
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        # Add deployment steps here
+        git push origin main
