@@ -23,6 +23,14 @@ jobs:
       with:
         java-version: '17'
 
+    - name: Rebase hotfix on main
+      if: github.event_name == 'push' && github.ref == 'refs/heads/hotfix'
+      run: |
+        git fetch origin main
+        git rebase origin/main
+
     - name: Run tests with Maven
       run: mvn test
+
+   
 
