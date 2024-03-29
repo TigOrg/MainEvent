@@ -1,20 +1,39 @@
-
-name: Unit test back
+name: Unit test and Rebase
 
 on:
   push:
-     branches: [ $default-branch ]
+    branches:
+      - develop
+      - main
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - develop
+      - main
 
 jobs:
-  build-and-test:
+  build-and-rebase:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Git
+      run: git config --global user.email "you@example.com" && git config --global user.name "Your Name"
+
+    - name: Rebase develop on main
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        git fetch origin main
+        git rebase origin/main
+        git push origin main
+
     - name: Set up JDK 17
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
         java-version: '17'
-    - name: run tests with Maven
+        distribution: 'adopt'
+
+    - name: Run tests with Maven
       run: mvn test
+
