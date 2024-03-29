@@ -1,59 +1,22 @@
-name: Unit test and Merge
+name: Delete Merged Branch
 
 on:
-  push:
-    branches:
-      - develop
-      - main
-      - hotfix/*
   pull_request:
-    branches:
-      - develop
-      - main
-      - hotfix/*
+    types: [closed]
 
 jobs:
-  build-and-merge:
+  delete_merged_branch:
     runs-on: ubuntu-latest
-
+    if: github.event.pull_request.merged == true
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Git
-      run: |
-        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-        git config --global user.name "${{ github.actor }}"
-
-    - name: Fetch and checkout main
-      if: github.event_name == 'push' || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.head.ref, 'hotfix/'))
-      run: |
-        git fetch origin main
-        git checkout main
-
-    - name: Pull latest changes on main
-      if: github.event_name == 'push' || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.head.ref, 'hotfix/'))
-      run: git pull origin main
-
-    - name: Merge hotfix into main
-      if: github.event_name == 'push' && github.ref == 'refs/heads/hotfix/*'
-      run: |
-        git fetch origin hotfix
-        git checkout hotfix
-        git pull origin hotfix
-        git checkout main
-        git merge hotfix
-        git push origin main
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v2
-      with:
-        java-version: '17'
-
-    - name: Run tests with Maven
-      run: mvn test
-
-    - name: Deploy to Production
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        # Add deployment steps here
+      - name: Delete merged branch
+        run: |
+          git fetch --prune
+          branch_name="${{ github.event.pull_request.head.ref }}"
+          # Verifica se a branch mesclada não é main nem develop
+          if [ "$branch_name" != "main" ] && [ "$branch_name" != "develop" ]; then
+            git push origin --delete "$branch_name"
+          fi
