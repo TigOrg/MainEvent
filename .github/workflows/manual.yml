@@ -1,22 +1,17 @@
-name: Delete Merged Branch
+name: Delete Branch After Pull Request
 
 on:
   pull_request:
     types: [closed]
 
 jobs:
-  delete_merged_branch:
+  delete_branch:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Delete merged branch
+      - name: Delete branch
         run: |
           git fetch --prune
-          branch_name="${{ github.event.pull_request.head.ref }}"
-          # Verifica se a branch mesclada não é main nem develop
-          if [ "$branch_name" != "main" ] && [ "$branch_name" != "develop" ]; then
-            git push origin --delete "$branch_name"
-          fi
+          git push origin --delete ${{ github.head_ref }}
